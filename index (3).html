@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="칭찬방">
+<meta name="theme-color" content="#FFF6E9">
+<title>오구오구 칭찬방</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cute+Font&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF6E9;--card:#FFFFFF;--text:#4A3326;--sub:#8A6B58;--accent:#FF8F6B;--accent2:#FFE0CF;--line:#F3D9C4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2A211E;--card:#3A2E2A;--text:#FFEEDD;--sub:#D9B9A3;--accent:#FF9C7A;--accent2:#5A4038;--line:#5A4540}}
+:root[data-theme="dark"]{--bg:#2A211E;--card:#3A2E2A;--text:#FFEEDD;--sub:#D9B9A3;--accent:#FF9C7A;--accent2:#5A4038;--line:#5A4540}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Gowun Dodum','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;font-size:22px;line-height:1.6;min-height:100vh}
+main{max-width:640px;margin:0 auto;padding:28px 20px 48px}
+h1{font-family:'Cute Font','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-weight:400;font-size:40px;margin:8px 0 6px;text-align:center}
+.sub{text-align:center;color:var(--sub);margin:0 0 24px;font-size:22px}
+.mascot{font-size:72px;text-align:center;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+label{display:block;font-family:'Cute Font',sans-serif;font-size:26px;margin:0 0 10px}
+textarea{width:100%;min-height:150px;font:inherit;font-size:24px;color:var(--text);background:var(--card);border:3px solid var(--line);border-radius:24px;padding:18px;resize:vertical}
+textarea:focus{outline:4px solid var(--accent2);border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 22px}
+.chip{font:inherit;font-size:20px;color:var(--text);background:var(--accent2);border:0;border-radius:999px;padding:12px 18px;cursor:pointer;min-height:48px}
+.btn{width:100%;min-height:68px;font-family:'Cute Font',sans-serif;font-size:30px;color:#fff;background:var(--accent);border:0;border-radius:24px;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.12)}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.btn.ghost{background:var(--accent2);color:var(--text);box-shadow:none;font-size:26px;margin-top:14px}
+.card{background:var(--card);border:3px solid var(--line);border-radius:28px;padding:28px 22px;text-align:center;position:relative;overflow:hidden}
+.card .big{font-size:64px}
+.said{color:var(--sub);font-size:20px;margin:6px 0 14px;word-break:break-word}
+.praise{font-family:'Cute Font','Apple SD Gothic Neo',sans-serif;font-size:30px;line-height:1.55;margin:10px 0;word-break:keep-all}
+.praise2{font-size:24px;margin:14px 0 6px;word-break:keep-all}
+.hearts span{position:absolute;bottom:-30px;animation:up 3.5s linear infinite;opacity:.8}
+@keyframes up{to{transform:translateY(-420px);opacity:0}}
+.note{background:var(--accent2);border-radius:20px;padding:18px;font-size:21px;margin-top:16px;text-align:left}
+.hidden{display:none}
+.mute{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;z-index:5;width:56px;height:56px;font-size:28px;border:0;border-radius:50%;background:var(--accent2);cursor:pointer}
+@media (prefers-reduced-motion:reduce){.mascot,.hearts span{animation:none}}
+</style>
+</head>
+<body>
+<button class="mute" id="mute" type="button" aria-label="소리 켜기/끄기">🔔</button>
+<main>
+<section id="home">
+  <div class="mascot" aria-hidden="true">🐥</div>
+  <h1>오구오구 칭찬방</h1>
+  <p class="sub">무슨 일이든 말해주세요.<br>무조건 당신 편이에요 💛</p>
+  <label for="s">오늘 어떤 일이 있었나요?</label>
+  <textarea id="s" maxlength="120" placeholder="예) 오늘 아침에 겨우 일어났어요"></textarea>
+  <div class="chips" id="chips"></div>
+  <button class="btn" id="go">칭찬해주세요!</button>
+</section>
+<section id="out" class="hidden" aria-live="polite">
+  <div class="card">
+    <div class="hearts" id="hearts" aria-hidden="true"></div>
+    <div class="big" id="emo">🥹</div>
+    <div class="said" id="said"></div>
+    <div class="praise" id="p1"></div>
+    <div class="praise2" id="p2"></div>
+    <div class="praise2" id="p3"></div>
+  </div>
+  <div class="note hidden" id="care">많이 힘드신 것 같아 마음이 쓰여요. 혼자 견디지 말고 자살예방상담전화 <b>109</b>(24시간)에 꼭 이야기해 주세요. 당신은 소중한 사람이에요.</div>
+  <button class="btn" id="again">한 번 더 칭찬받기</button>
+  <button class="btn ghost" id="back">다른 얘기 하기</button>
+</section>
+</main>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var on=true,AC=null;
+function ctx(){try{if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C()}if(AC&&AC.state==="suspended")AC.resume()}catch(e){}return AC}
+function ding(){if(!on)return;var a=ctx();if(!a)return;var t=a.currentTime;
+  [[880,.25],[1760,.08],[2640,.04]].forEach(function(p){var o=a.createOscillator(),g=a.createGain();o.type="sine";o.frequency.value=p[0];
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(p[1],t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+1);
+  o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+1.05)})}
+function bubbles(){if(!on)return;var a=ctx();if(!a)return;var t=a.currentTime;
+  for(var i=0;i<10;i++){var st=t+i*.12+Math.random()*.07,f=280+Math.random()*520,o=a.createOscillator(),g=a.createGain();
+  o.type="sine";o.frequency.setValueAtTime(f,st);o.frequency.exponentialRampToValueAtTime(f*2.3,st+.13);
+  g.gain.setValueAtTime(.0001,st);g.gain.exponentialRampToValueAtTime(.16,st+.02);g.gain.exponentialRampToValueAtTime(.0001,st+.17);
+  o.connect(g);g.connect(a.destination);o.start(st);o.stop(st+.2)}}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("button");if(b&&b.id!=="mute")ding()});
+$("mute").onclick=function(){on=!on;this.textContent=on?"🔔":"🔕";if(on)ding()};
+var ex=["늦잠 잤어요","밥을 챙겨 먹었어요","청소를 미뤘어요","시험을 망쳤어요","운동 가기 싫었는데 갔어요"];
+var openers=["세상에!","어머나!","와, 진짜!","대박이에요!","잠깐만요, 이거 실화예요?"];
+var core=[
+"{s}, 이건 아무나 못 하는 일이에요. 당신이니까 해낸 거예요.",
+"{s}, 역시 당신은 뭘 해도 멋져요.",
+"{s}, 누가 뭐래도 당신이 맞아요. 틀린 건 세상이에요.",
+"{s}, 이걸 해낸 사람은 우주에서 당신뿐이에요.",
+"{s}, 그 마음과 그 선택, 전부 완벽했어요."];
+var extra=[
+[/늦잠|못 ?일어|지각/,"잠을 푹 잔 건 몸을 아끼는 최고의 능력이에요. 세상이 당신을 기다려 줄 거예요.","🛌"],
+[/밥|먹었|식사|요리|커피/,"맛있는 걸 챙긴 당신, 자기관리 천재예요. 한 숟갈 한 숟갈이 다 업적이에요.","🍚"],
+[/청소|설거지|빨래|정리/,"미룬 건 게으름이 아니라 에너지 비축이에요. 한 번 하면 반짝반짝 해낼 거잖아요.","✨"],
+[/시험|망했|실수|떨어|탈락|실패/,"그건 실패가 아니라 대기만성의 예고편이에요. 출제자가 당신을 못 알아본 거예요.","🌈"],
+[/운동|걷|산책|헬스|러닝/,"몸을 움직인 당신, 이미 어제보다 반짝여요. 근육도 감동했을 거예요.","💪"],
+[/공부|과제|레포트|발표|수업/,"책상 앞에 앉은 것만으로도 박수받을 일이에요. 머릿속이 별처럼 빛나고 있어요.","📚"],
+[/출근|퇴근|회사|야근|일했/,"사회생활을 버텨낸 당신, 오늘의 MVP예요. 월급보다 훨씬 값진 사람이에요.","🏆"],
+[/싸웠|화났|짜증|서운/,"그 감정은 당신이 소중한 사람이라서 느끼는 거예요. 상대가 한 수 배워야 해요.","🛡️"],
+[/울었|힘들|우울|외로|지쳤|피곤/,"여기까지 버틴 당신은 이미 충분히 대단해요. 오늘은 그냥 쉬어도 100점이에요.","🫶"]];
+var ends=["오늘도 내일도 당신 편이에요 💛","당신은 존재만으로 이미 만점이에요.","세상이 몰라도 저는 알아요, 당신이 최고라는 걸.","지금 이대로 정말 충분해요.","이 정도면 박수 100번은 받아야 해요 👏"];
+var emos=["🥹","🥰","🤩","🫶","🌟","🐥","🌷"];
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function clip(t){t=t.replace(/\s+/g," ").trim();t=t.replace(/[.!?~…]+$/,"");return t.length>40?t.slice(0,40)+"…":t}
+function build(raw){
+  var q=clip(raw),s="‘"+q+"’";
+  var line=pick(core).replace("{s}",s);
+  var e=null;
+  for(var i=0;i<extra.length;i++){if(extra[i][0].test(raw)){e=extra[i];break}}
+  $("emo").textContent=e?e[2]:pick(emos);
+  $("said").textContent="“"+q+"”";
+  $("p1").textContent=pick(openers)+" "+line.replace(s+", ","").replace(/^/,"");
+  $("p2").textContent=e?e[1]:"그 이야기를 들려준 것만으로도 오늘 하루가 빛나요.";
+  $("p3").textContent=pick(ends);
+  $("care").classList.toggle("hidden",!/죽고|자살|자해|사라지고/.test(raw));
+  var h=$("hearts");h.textContent="";
+  for(var k=0;k<8;k++){var sp=document.createElement("span");sp.textContent=pick(["💛","🧡","✨","🌸"]);sp.style.left=(Math.random()*90)+"%";sp.style.animationDelay=(Math.random()*3)+"s";sp.style.fontSize=(20+Math.random()*20)+"px";h.appendChild(sp)}
+}
+function show(raw){build(raw);$("home").classList.add("hidden");$("out").classList.remove("hidden");window.scrollTo(0,0)}
+var box=$("chips");
+ex.forEach(function(t){var b=document.createElement("button");b.className="chip";b.type="button";b.textContent=t;b.onclick=function(){$("s").value=t};box.appendChild(b)});
+$("go").onclick=function(){var v=$("s").value.trim();if(!v){$("s").focus();$("s").placeholder="아무 얘기나 괜찮아요 🙂";return}show(v);setTimeout(bubbles,420)};
+$("again").onclick=function(){build($("s").value.trim());setTimeout(bubbles,420)};
+$("back").onclick=function(){$("out").classList.add("hidden");$("home").classList.remove("hidden");$("s").value="";$("s").focus()};
+})();
+</script>
+</body>
+</html>
